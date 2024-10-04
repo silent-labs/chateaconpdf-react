@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Badge, TextField, Button, CircularProgress } from '@material-ui/core';
 import { CloudUpload as CloudUploadIcon, Send as SendIcon } from '@material-ui/icons';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { materialDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 function ChatPDF() {
   const [archivo, setArchivo] = useState(null);
@@ -66,7 +70,6 @@ function ChatPDF() {
     formData.append('pdf', archivo);
   
     try {
-      // Cambia la URL de /uploadpdf a /extractpdf
       const respuesta = await fetch('http://localhost:3002/extractpdf', {
         method: 'POST',
         body: formData,
@@ -88,7 +91,6 @@ function ChatPDF() {
     }
   };
   
-
   return (
     <div className="flex flex-col min-h-screen bg-gray-900 p-6">
       <h1 className="text-3xl font-bold text-blue-400 mb-4">Chat con el Bot</h1>
@@ -96,18 +98,49 @@ function ChatPDF() {
         {mensajes.map((msg, index) => (
           <div
             key={index}
-            className={`mb-4 p-4 rounded-md flex items-center ${msg.tipo === 'user' ? 'bg-blue-600 text-white self-end' : 'bg-gray-700 text-gray-200 self-start'}`}
+            className={`mb-4 p-4 rounded-md ${
+              msg.tipo === 'user' 
+                ? 'bg-blue-600 text-white ml-auto max-w-[70%]' 
+                : 'bg-gray-700 text-gray-200 mr-auto max-w-[70%]'
+            }`}
           >
-            {msg.tipo === 'user' ? (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A5 5 0 018 16h8a5 5 0 012.879.804M15 12a3 3 0 10-6 0m-2 8h10a2 2 0 002-2v-5a7 7 0 10-14 0v5a2 2 0 002 2z" />
-              </svg>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11c0-1.105.895-2 2-2h.01c1.104 0 2-.895 2-2V4.414c0-.89-1.077-1.337-1.707-.707L12 5.707 9.707 3.707C9.077 3.077 8 3.524 8 4.414V7c0 1.105.895 2 2 2H12c1.104 0 2 .895 2 2v1c0 1.105-.896 2-2 2H7c-1.104 0-2 .896-2 2v2a2 2 0 002 2h10a2 2 0 002-2v-2c0-1.104-.896-2-2-2h-5z" />
-              </svg>
-            )}
-            {msg.texto}
+            <div className="flex items-start">
+              {msg.tipo === 'user' ? (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A5 5 0 018 16h8a5 5 0 012.879.804M15 12a3 3 0 10-6 0m-2 8h10a2 2 0 002-2v-5a7 7 0 10-14 0v5a2 2 0 002 2z" />
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11c0-1.105.895-2 2-2h.01c1.104 0 2-.895 2-2V4.414c0-.89-1.077-1.337-1.707-.707L12 5.707 9.707 3.707C9.077 3.077 8 3.524 8 4.414V7c0 1.105.895 2 2 2H12c1.104 0 2 .895 2 2v1c0 1.105-.896 2-2 2H7c-1.104 0-2 .896-2 2v2a2 2 0 002 2h10a2 2 0 002-2v-2c0-1.104-.896-2-2-2h-5z" />
+                </svg>
+              )}
+              <div className="flex-grow overflow-hidden">
+                <ReactMarkdown
+                  children={msg.texto}
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    code({ node, inline, className, children, ...props }) {
+                      const match = /language-(\w+)/.exec(className || '');
+                      return !inline && match ? (
+                        <div className="mt-2 overflow-x-auto">
+                          <SyntaxHighlighter
+                            children={String(children).replace(/\n$/, '')}
+                            style={materialDark}
+                            language={match[1]}
+                            PreTag="div"
+                            {...props}
+                          />
+                        </div>
+                      ) : (
+                        <code className={`${className} bg-gray-800 rounded px-1 py-0.5`} {...props}>
+                          {children}
+                        </code>
+                      );
+                    },
+                  }}
+                />
+              </div>
+            </div>
           </div>
         ))}
         {cargando && (
