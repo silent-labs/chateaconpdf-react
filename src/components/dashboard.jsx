@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MenuSidebar from './menu-sidebar';
 
@@ -6,10 +6,19 @@ function Dashboard() {
   const [archivo, setArchivo] = useState(null);
   const [numPreguntas, setNumPreguntas] = useState(5);
   const [cargando, setCargando] = useState(false);
+  const [progreso, setProgreso] = useState(0);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (archivo) {
+      setProgreso(0);
+    }
+  }, [archivo]);
+
   const manejarCambioArchivo = (evento) => {
-    setArchivo(evento.target.files[0]);
+    const archivoSeleccionado = evento.target.files[0];
+    setArchivo(archivoSeleccionado);
+    setProgreso(0);
   };
 
   const manejarCambioNumPreguntas = (evento) => {
@@ -23,6 +32,7 @@ function Dashboard() {
     }
 
     setCargando(true);
+    setProgreso(10);
 
     const formData = new FormData();
     formData.append('pdf', archivo);
@@ -32,7 +42,15 @@ function Dashboard() {
       const respuesta = await fetch('http://localhost:3002/extractpdf', {
         method: 'POST',
         body: formData,
+        onUploadProgress: (event) => {
+          if (event.lengthComputable) {
+            const porcentajeProgreso = Math.round((event.loaded * 100) / event.total);
+            setProgreso(porcentajeProgreso);
+          }
+        },
       });
+
+      setProgreso(70);
 
       if (!respuesta.ok) {
         throw new Error('Error al procesar el PDF');
@@ -44,12 +62,14 @@ function Dashboard() {
       // Asegúrate de que solo se pasen el número de preguntas especificado
       const preguntasLimitadas = preguntasArray.slice(0, numPreguntas);
 
+      setProgreso(100);
       navigate('/preguntas', { state: { preguntas: preguntasLimitadas } });
     } catch (error) {
       console.error('Error:', error);
       alert('Hubo un error al procesar el PDF. Por favor, intenta de nuevo.');
     } finally {
       setCargando(false);
+      setProgreso(0);
     }
   };
 
@@ -79,9 +99,12 @@ function Dashboard() {
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
-                  {archivo ? archivo.name : 'Seleccionar archivo PDF'}
+                  {archivo ? `${archivo.name} (${(archivo.size / 1024).toFixed(2)} KB)` : 'Seleccionar archivo PDF'}
                 </label>
               </div>
+              {archivo && (
+                <p className="text-sm text-gray-400 mt-2">Archivo seleccionado: {archivo.name} ({(archivo.size / 1024).toFixed(2)} KB)</p>
+              )}
             </div>
             <div>
               <label htmlFor="numPreguntas" className="block text-sm font-medium text-gray-300 mb-2">
@@ -95,8 +118,17 @@ function Dashboard() {
                 min="1"
                 max="20"
                 className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={cargando}
               />
             </div>
+            {cargando && (
+              <div className="w-full bg-gray-700 rounded-md overflow-hidden h-4 mb-4">
+                <div
+                  className="bg-blue-600 h-full text-center text-xs font-medium text-white leading-none"
+                  style={{ width: `${progreso}%` }}
+                >{`${progreso}%`}</div>
+              </div>
+            )}
             <button
               onClick={generarPreguntas}
               type="button"
