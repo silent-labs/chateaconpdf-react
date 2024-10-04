@@ -6,14 +6,14 @@ function Dashboard() {
   const [archivo, setArchivo] = useState(null);
   const [numPreguntas, setNumPreguntas] = useState(5);
   const [cargando, setCargando] = useState(false);
-  const navigate = useNavigate(); // Hook para navegar entre rutas
+  const navigate = useNavigate();
 
   const manejarCambioArchivo = (evento) => {
     setArchivo(evento.target.files[0]);
   };
 
   const manejarCambioNumPreguntas = (evento) => {
-    setNumPreguntas(evento.target.value);
+    setNumPreguntas(Number(evento.target.value));
   };
 
   const generarPreguntas = async () => {
@@ -26,6 +26,7 @@ function Dashboard() {
 
     const formData = new FormData();
     formData.append('pdf', archivo);
+    formData.append('numPreguntas', numPreguntas);
 
     try {
       const respuesta = await fetch('http://localhost:3002/extractpdf', {
@@ -38,11 +39,12 @@ function Dashboard() {
       }
 
       const datos = await respuesta.json();
-      
-      const preguntasArray = datos.preguntas.split('\n'); // Convierte el texto a array
+      const preguntasArray = Array.isArray(datos.preguntas) ? datos.preguntas : [];
 
-      // Navega a /preguntas y pasa las preguntas como estado
-      navigate('/preguntas', { state: { preguntas: preguntasArray } });
+      // Asegúrate de que solo se pasen el número de preguntas especificado
+      const preguntasLimitadas = preguntasArray.slice(0, numPreguntas);
+
+      navigate('/preguntas', { state: { preguntas: preguntasLimitadas } });
     } catch (error) {
       console.error('Error:', error);
       alert('Hubo un error al procesar el PDF. Por favor, intenta de nuevo.');

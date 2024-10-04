@@ -4,40 +4,45 @@ import MenuSidebar from './menu-sidebar';
 
 function Preguntas() {
   const location = useLocation();
-  const { preguntas } = location.state || { preguntas: [] }; // Accede a las preguntas desde el estado de React Router
+  const { preguntas = [] } = location.state || {}; // Accede a las preguntas desde el estado de React Router
   const [respuestasSeleccionadas, setRespuestasSeleccionadas] = useState({}); // Estado para almacenar las respuestas seleccionadas
   const [puntuacion, setPuntuacion] = useState(null);
-
-  // Simulación de opciones de respuesta para cada pregunta
-  const opciones = [
-    'a) Ingeniero civil',
-    'b) Desarrollador de aplicaciones web de pila completa',
-    'c) Analista de sistemas',
-    'd) Diseñador gráfico'
-  ];
+  const [respuestasCorrectas, setRespuestasCorrectas] = useState([]); // Estado para almacenar las respuestas correctas/incorrectas
 
   // Manejar la selección de respuestas
   const manejarSeleccionRespuesta = (preguntaIndex, opcion) => {
     setRespuestasSeleccionadas((prevRespuestas) => ({
       ...prevRespuestas,
-      [preguntaIndex]: opcion
+      [preguntaIndex]: opcion,
     }));
   };
 
   // Calcular la puntuación final
   const calcularPuntuacion = () => {
-    // Asumimos que la respuesta correcta para todas es "b) Desarrollador de aplicaciones web de pila completa"
-    const respuestasCorrectas = preguntas.map((_, index) => 'b) Desarrollador de aplicaciones web de pila completa');
     let aciertos = 0;
+    const correctas = [];
 
     preguntas.forEach((pregunta, index) => {
-      if (respuestasSeleccionadas[index] === respuestasCorrectas[index]) {
-        aciertos++;
+      if (pregunta.opciones) {
+        // Pregunta con opciones (como de opción múltiple o verdadero/falso)
+        if (respuestasSeleccionadas[index]?.trim().toLowerCase() === pregunta.respuesta_correcta.trim().toLowerCase()) {
+          aciertos++;
+          correctas[index] = true;
+        } else {
+          correctas[index] = false;
+        }
+      } else {
+        // Pregunta abierta: evalúa si la respuesta es correcta
+        correctas[index] = respuestasSeleccionadas[index]?.trim().toLowerCase() === pregunta.respuesta?.trim().toLowerCase();
+        if (correctas[index]) {
+          aciertos++;
+        }
       }
     });
 
     const puntuacionFinal = (aciertos / preguntas.length) * 100;
     setPuntuacion(puntuacionFinal.toFixed(2));
+    setRespuestasCorrectas(correctas);
   };
 
   return (
@@ -50,22 +55,37 @@ function Preguntas() {
             <>
               {preguntas.map((pregunta, index) => (
                 <div key={index} className="mb-6">
-                  <p className="text-lg font-medium text-white mb-2">{pregunta}</p>
+                  <p className="text-lg font-medium text-white mb-2">{pregunta.pregunta}</p>
                   <div className="space-y-2">
-                    {opciones.map((opcion, opcionIndex) => (
-                      <label key={opcionIndex} className="flex items-center space-x-3">
-                        <input
-                          type="radio"
-                          name={`pregunta-${index}`}
-                          value={opcion}
-                          onChange={() => manejarSeleccionRespuesta(index, opcion)}
-                          checked={respuestasSeleccionadas[index] === opcion}
-                          className="form-radio text-blue-600"
-                        />
-                        <span className="text-gray-300">{opcion}</span>
-                      </label>
-                    ))}
+                    {pregunta.opciones ? (
+                      pregunta.opciones.map((opcion, opcionIndex) => (
+                        <label key={opcionIndex} className="flex items-center space-x-3">
+                          <input
+                            type="radio"
+                            name={`pregunta-${index}`}
+                            value={opcion}
+                            onChange={() => manejarSeleccionRespuesta(index, opcion)}
+                            checked={respuestasSeleccionadas[index] === opcion}
+                            className="form-radio text-blue-600"
+                          />
+                          <span className="text-gray-300">{opcion}</span>
+                        </label>
+                      ))
+                    ) : (
+                      <input
+                        type="text"
+                        placeholder="Escribe tu respuesta"
+                        onChange={(e) => manejarSeleccionRespuesta(index, e.target.value)}
+                        value={respuestasSeleccionadas[index] || ''}
+                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    )}
                   </div>
+                  {respuestasCorrectas.length > 0 && (
+                    <p className={`mt-2 text-sm font-semibold ${respuestasCorrectas[index] ? 'text-green-500' : 'text-red-500'}`}>
+                      {respuestasCorrectas[index] ? 'Respuesta correcta' : `Respuesta incorrecta. La correcta es: ${pregunta.respuesta_correcta || pregunta.respuesta}`}
+                    </p>
+                  )}
                 </div>
               ))}
               <button
