@@ -19,6 +19,7 @@ function Profile() {
   const [error, setError] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const navigate = useNavigate();
+  const [subscriptionInfo, setSubscriptionInfo] = useState(null);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -29,28 +30,38 @@ function Profile() {
       }
 
       try {
-        const response = await fetch('http://localhost:3002/user-info', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
+        const [userResponse, subscriptionResponse] = await Promise.all([
+          fetch('http://localhost:3002/user-info', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          }),
+          fetch('http://localhost:3002/subscription-info', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          })
+        ]);
 
-        if (!response.ok) {
-          throw new Error('Error al obtener la información del usuario');
+        if (!userResponse.ok || !subscriptionResponse.ok) {
+          throw new Error('Error al obtener la información del usuario o la suscripción');
         }
 
-        const data = await response.json();
-        setUserInfo(data);
+        const userData = await userResponse.json();
+        const subscriptionData = await subscriptionResponse.json();
+
+        setUserInfo(userData);
+        setSubscriptionInfo(subscriptionData);
         setEditedInfo({
-          email: data.email,
-          username: data.username,
+          email: userData.email,
+          username: userData.username,
           currentPassword: '',
           newPassword: '',
           confirmPassword: ''
         });
       } catch (error) {
         console.error('Error:', error);
-        setError('No se pudo cargar la información del usuario');
+        setError('No se pudo cargar la información del usuario o la suscripción');
       } finally {
         setIsLoading(false);
       }
@@ -139,6 +150,29 @@ function Profile() {
     } catch (error) {
       console.error('Error:', error);
       setError('No se pudo actualizar la información del usuario');
+    }
+  };
+
+  const handleManageSubscription = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:3002/create-billing-session', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al crear la sesión de facturación');
+      }
+
+      const { url } = await response.json();
+      window.location.href = url;
+    } catch (error) {
+      console.error('Error:', error);
+      setError('No se pudo abrir el portal de facturación');
     }
   };
 
@@ -238,6 +272,47 @@ function Profile() {
                 <p className="mt-1 text-lg text-white">
                   {new Date(userInfo.createdAt).toLocaleDateString()}
                 </p>
+              </div>
+              <div>
+                <h2 className="text-2xl font-semibold text-white mt-8 mb-4">Información de Suscripción</h2>
+                {subscriptionInfo ? (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400">Tipo de suscripción</label>
+                      <p className="mt-1 text-lg text-white">{subscriptionInfo.tipo}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400">Estado</label>
+                      <p className="mt-1 text-lg text-white">{subscriptionInfo.estado}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400">Fecha de inicio</label>
+                      <p className="mt-1 text-lg text-white">
+                        {new Date(subscriptionInfo.fechaInicio).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400">Periodo de facturación</label>
+                      <p className="mt-1 text-lg text-white">{subscriptionInfo.periodoFacturacion}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400">Monto</label>
+                      <p className="mt-1 text-lg text-white">
+                        {subscriptionInfo.monto} {subscriptionInfo.moneda}
+                      </p>
+                    </div>
+                    <div className="mt-4">
+                      <button
+                        onClick={handleManageSubscription}
+                        className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition duration-200"
+                      >
+                        Manejar Suscripción
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-gray-400">No hay información de suscripción disponible</p>
+                )}
               </div>
               <div>
                 <button onClick={() => setIsEditing(true)} className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition duration-200">Editar perfil</button>
