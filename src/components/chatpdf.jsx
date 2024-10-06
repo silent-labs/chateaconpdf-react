@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Badge, TextField, Button, CircularProgress } from '@material-ui/core';
-import { CloudUpload as CloudUploadIcon, Send as SendIcon } from '@material-ui/icons';
+import { CloudUpload as CloudUploadIcon, Send as SendIcon, FileCopy as FileCopyIcon } from '@material-ui/icons';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -90,7 +90,19 @@ function ChatPDF() {
       setCargando(false);
     }
   };
-  
+
+  const copiarAlPortapapeles = useCallback((texto) => {
+    navigator.clipboard.writeText(texto).then(
+      () => {
+        // Opcional: Mostrar una notificación de éxito
+        alert('Código copiado al portapapeles');
+      },
+      (err) => {
+        console.error('Error al copiar el texto: ', err);
+      }
+    );
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-900 p-6">
       <h1 className="text-3xl font-bold text-blue-400 mb-4">Chat con el Bot</h1>
@@ -111,7 +123,7 @@ function ChatPDF() {
                 </svg>
               ) : (
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11c0-1.105.895-2 2-2h.01c1.104 0 2-.895 2-2V4.414c0-.89-1.077-1.337-1.707-.707L12 5.707 9.707 3.707C9.077 3.077 8 3.524 8 4.414V7c0 1.105.895 2 2 2H12c1.104 0 2 .895 2 2v1c0 1.105-.896 2-2 2H7c-1.104 0-2 .896-2 2v2a2 2 0 002 2h10a2 2 0 002-2v-2c0-1.104-.896-2-2-2h-5z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11c0-1.105.895-2 2-2h.01c1.104 0 2-.895 2-2V4.414c0-.89-1.077-1.337-1.707-.707L12 5.707 9.707 3.707C9.077 3.077 8 3.524 8 4.414V7c0 1.105-.896 2-2 2H7c-1.104 0-2 .896-2 2v2a2 2 0 002 2h10a2 2 0 002-2v-2c0-1.104-.896-2-2-2h-5z" />
                 </svg>
               )}
               <div className="flex-grow overflow-hidden">
@@ -122,7 +134,7 @@ function ChatPDF() {
                     code({ node, inline, className, children, ...props }) {
                       const match = /language-(\w+)/.exec(className || '');
                       return !inline && match ? (
-                        <div className="mt-2 overflow-x-auto">
+                        <div className="mt-2 overflow-x-auto relative">
                           <SyntaxHighlighter
                             children={String(children).replace(/\n$/, '')}
                             style={materialDark}
@@ -130,6 +142,12 @@ function ChatPDF() {
                             PreTag="div"
                             {...props}
                           />
+                          <button
+                            onClick={() => copiarAlPortapapeles(String(children))}
+                            className="absolute top-2 right-2 bg-gray-600 hover:bg-gray-700 text-white p-1 rounded"
+                          >
+                            <FileCopyIcon fontSize="small" />
+                          </button>
                         </div>
                       ) : (
                         <code className={`${className} bg-gray-800 rounded px-1 py-0.5`} {...props}>
