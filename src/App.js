@@ -5,6 +5,7 @@ import Dashboard from './components/dashboard';
 import Preguntas from './components/preguntas';
 import ChatPDF from './components/chatpdf';
 import Register from './components/register';
+import Profile from './components/Profile';
 import ProtectedRoute from './components/ProtectedRoute';
 import './index.css';
 
@@ -37,6 +38,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <ChatPDF />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/perfil" 
+            element={
+              <ProtectedRoute>
+                <Profile />
               </ProtectedRoute>
             } 
           />
