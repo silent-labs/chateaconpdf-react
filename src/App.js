@@ -1,12 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Login from './components/login';
-import Dashboard from './components/dashboard';
-import Preguntas from './components/preguntas';
-import ChatPDF from './components/chatpdf';
 import Register from './components/register';
 import Profile from './components/Profile';
-import ProtectedRoute from './components/ProtectedRoute';
 import Suscripciones from './components/Suscripciones';
 import Success from './components/Success';
 import './index.css';
