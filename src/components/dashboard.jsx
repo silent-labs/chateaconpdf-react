@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import MenuSidebar from './menu-sidebar';
 
 function Dashboard() {
   const [archivo, setArchivo] = useState(null);
@@ -96,6 +97,7 @@ function Dashboard() {
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
+      <MenuSidebar />
       <div className="flex-1 p-8">
         <div className="max-w-2xl mx-auto">
           {/* Header */}
