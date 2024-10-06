@@ -4,6 +4,7 @@ import Login from './components/login';
 import Dashboard from './components/dashboard';
 import Preguntas from './components/preguntas';
 import ChatPDF from './components/chatpdf';
+import Register from './components/register';
 import './index.css';
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/preguntas" element={<Preguntas />} />
           <Route path="/chatpdf" element={<ChatPDF />} />
+          <Route path="/register" element={<Register />} />
         </Routes>
       </div>
     </Router>
