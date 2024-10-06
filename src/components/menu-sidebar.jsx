@@ -2,51 +2,65 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaChartBar, FaUser, FaCog, FaSignOutAlt, FaBars, FaChevronLeft } from 'react-icons/fa';
 
-function MenuSidebar() {
+const MenuSidebar = () => {
   const [isExpanded, setIsExpanded] = useState(true);
 
   const toggleSidebar = () => {
     setIsExpanded(!isExpanded);
   };
 
+  const menuItems = [
+    { icon: FaChartBar, text: 'Dashboard', link: '/dashboard' },
+    { icon: FaUser, text: 'Perfil', link: '/perfil' },
+    { icon: FaCog, text: 'Configuración', link: '/configuracion' },
+    { icon: FaSignOutAlt, text: 'Cerrar sesión', link: '/login', danger: true },
+  ];
+
   return (
-    <div className={`bg-gradient-to-b from-gray-900 to-gray-800 text-white ${isExpanded ? 'w-64' : 'w-20'} min-h-screen p-4 transition-all duration-300 shadow-lg`}>
+    <div className={`bg-gradient-to-br from-gray-900 to-gray-800 text-white ${isExpanded ? 'w-64' : 'w-20'} min-h-screen p-4 transition-all duration-300 shadow-lg`}>
       <div className="flex justify-between items-center mb-8">
-        {isExpanded && <h2 className="text-2xl font-bold text-blue-400 tracking-wide">Mi Aplicación</h2>}
-        <button onClick={toggleSidebar} className="text-white hover:text-blue-400 transition duration-200 p-2 rounded-full hover:bg-gray-700">
+        {isExpanded && (
+          <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-400">
+            Mi Aplicación
+          </h2>
+        )}
+        <button
+          onClick={toggleSidebar}
+          className="text-gray-400 hover:text-white transition duration-200 p-2 rounded-full hover:bg-gray-700/50"
+        >
           {isExpanded ? <FaChevronLeft size={20} /> : <FaBars size={20} />}
         </button>
       </div>
       <nav>
-        <ul className="space-y-4">
-          <li>
-            <Link to="/dashboard" className={`flex items-center py-3 px-4 rounded-lg hover:bg-blue-600 transition duration-200 ${!isExpanded && 'justify-center'} group`}>
-              <FaChartBar size={22} className={`${isExpanded ? 'mr-3' : 'mr-0'} group-hover:scale-110 transition-transform duration-200`} />
-              {isExpanded && <span className="font-medium">Dashboard</span>}
-            </Link>
-          </li>
-          <li>
-            <Link to="/perfil" className={`flex items-center py-3 px-4 rounded-lg hover:bg-blue-600 transition duration-200 ${!isExpanded && 'justify-center'} group`}>
-              <FaUser size={22} className={`${isExpanded ? 'mr-3' : 'mr-0'} group-hover:scale-110 transition-transform duration-200`} />
-              {isExpanded && <span className="font-medium">Perfil</span>}
-            </Link>
-          </li>
-          <li>
-            <Link to="/configuracion" className={`flex items-center py-3 px-4 rounded-lg hover:bg-blue-600 transition duration-200 ${!isExpanded && 'justify-center'} group`}>
-              <FaCog size={22} className={`${isExpanded ? 'mr-3' : 'mr-0'} group-hover:scale-110 transition-transform duration-200`} />
-              {isExpanded && <span className="font-medium">Configuración</span>}
-            </Link>
-          </li>
-          <li>
-            <Link to="/login" className={`flex items-center py-3 px-4 rounded-lg hover:bg-red-600 transition duration-200 ${!isExpanded && 'justify-center'} group`}>
-              <FaSignOutAlt size={22} className={`${isExpanded ? 'mr-3' : 'mr-0'} group-hover:scale-110 transition-transform duration-200`} />
-              {isExpanded && <span className="font-medium">Cerrar sesión</span>}
-            </Link>
-          </li>
+        <ul className="space-y-2">
+          {menuItems.map((item, index) => (
+            <li key={index}>
+              <Link
+                to={item.link}
+                className={`flex items-center py-3 px-4 rounded-xl ${
+                  item.danger ? 'hover:bg-red-600/20' : 'hover:bg-blue-600/20'
+                } transition duration-200 group`}
+              >
+                <div className={`flex items-center justify-center ${isExpanded ? 'w-8 mr-3' : 'w-full'}`}>
+                  <item.icon
+                    size={22}
+                    className={`${
+                      item.danger ? 'text-red-400' : 'text-blue-400'
+                    } group-hover:scale-110 transition-all duration-200`}
+                  />
+                </div>
+                {isExpanded && (
+                  <span className={`font-medium ${item.danger ? 'group-hover:text-red-400' : 'group-hover:text-blue-400'} transition-colors duration-200`}>
+                    {item.text}
+                  </span>
+                )}
+              </Link>
+            </li>
+          ))}
         </ul>
       </nav>
     </div>
   );
-}
+};
 
 export default MenuSidebar;
