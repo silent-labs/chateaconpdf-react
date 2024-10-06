@@ -5,6 +5,9 @@ import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { materialDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import MenuSidebar from './menu-sidebar';
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css';
+import Tour from 'reactour';
 
 function ChatPDF() {
   const [archivo, setArchivo] = useState(null);
@@ -16,6 +19,7 @@ function ChatPDF() {
   const navigate = useNavigate();
   const [caracteresRestantes, setCaracteresRestantes] = useState(4000);
   const fileInputRef = useRef(null);
+  const [isTourOpen, setIsTourOpen] = useState(true);
 
   const manejarCambioArchivo = (evento) => {
     const archivoSeleccionado = evento.target.files[0];
@@ -136,6 +140,13 @@ function ChatPDF() {
     };
   }, [isListening]);
 
+  const pasos = [
+    {
+      selector: '[data-tour="adjuntar-pdf"]',
+      content: 'Aquí puedes adjuntar un archivo PDF para chatear sobre su contenido.',
+    },
+  ];
+
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
       <MenuSidebar />
@@ -239,15 +250,17 @@ function ChatPDF() {
                 accept=".pdf"
                 className="hidden"
               />
-              <button
-                onClick={() => fileInputRef.current.click()}
-                className="absolute left-2 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-blue-400 transition-colors duration-200"
-                title="Adjuntar archivo PDF"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                </svg>
-              </button>
+              <Tippy content="Adjuntar archivo PDF" placement="top">
+                <button
+                  onClick={() => fileInputRef.current.click()}
+                  className="absolute left-2 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-blue-400 transition-colors duration-200"
+                  data-tour="adjuntar-pdf"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                  </svg>
+                </button>
+              </Tippy>
               <button
                 onClick={enviarMensaje}
                 disabled={cargando || mensaje.trim() === ''}
@@ -264,6 +277,11 @@ function ChatPDF() {
           </div>
         </div>
       </div>
+      <Tour
+        steps={pasos}
+        isOpen={isTourOpen}
+        onRequestClose={() => setIsTourOpen(false)}
+      />
     </div>
   );
 }
