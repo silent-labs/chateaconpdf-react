@@ -1,7 +1,36 @@
+// Suscripciones.js
+
 import React from 'react';
+import { loadStripe } from '@stripe/stripe-js';
 import MenuSidebar from './menu-sidebar';
 
 function Suscripciones() {
+  const handleSubscribe = async () => {
+    // Llamar al backend para crear una sesión de checkout
+    const response = await fetch('http://localhost:3002/create-checkout-session', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify({
+        productId: 'prod_QwEPiow1fB9jGO', // ID del producto Premium
+      }),
+    });
+
+    const { sessionId, publishableKey } = await response.json();
+
+    // Inicializar Stripe con la clave pública proporcionada por el backend
+    const stripe = await loadStripe(publishableKey);
+
+    // Redirigir al usuario a la sesión de checkout
+    const { error } = await stripe.redirectToCheckout({ sessionId });
+
+    if (error) {
+      console.error('Error al redirigir a Checkout:', error);
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
       <MenuSidebar />
@@ -18,7 +47,7 @@ function Suscripciones() {
                 <li className="flex items-center"><span className="text-blue-500 mr-2">✓</span> 10 usos diarios en Dashboard</li>
                 <li className="flex items-center"><span className="text-blue-500 mr-2">✓</span> Soporte por correo electrónico</li>
               </ul>
-              <button 
+              <button
                 className="w-full py-3 px-4 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-300 font-semibold"
               >
                 Plan Actual
@@ -36,8 +65,9 @@ function Suscripciones() {
                 <li className="flex items-center"><span className="text-purple-500 mr-2">✓</span> Funciones exclusivas</li>
               </ul>
               <p className="text-white mb-4 text-center font-bold text-xl">20€<span className="text-sm font-normal">/mes</span></p>
-              <button 
+              <button
                 className="w-full py-3 px-4 rounded-full bg-purple-600 text-white hover:bg-purple-700 transition-colors duration-300 font-semibold"
+                onClick={handleSubscribe}
               >
                 Seleccionar Plan
               </button>
