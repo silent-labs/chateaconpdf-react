@@ -8,6 +8,7 @@ import Register from './components/register';
 import Profile from './components/Profile';
 import ProtectedRoute from './components/ProtectedRoute';
 import Suscripciones from './components/Suscripciones';
+import Success from './components/Success';
 import './index.css';
 
 function App() {
@@ -58,6 +59,7 @@ function App() {
               </ProtectedRoute>
             } 
           />
+          <Route path="/success" element={<Success />} />
         </Routes>
       </div>
     </Router>
