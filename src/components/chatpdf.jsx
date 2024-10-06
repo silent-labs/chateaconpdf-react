@@ -19,7 +19,19 @@ function ChatPDF() {
   const navigate = useNavigate();
   const [caracteresRestantes, setCaracteresRestantes] = useState(4000);
   const fileInputRef = useRef(null);
-  const [isTourOpen, setIsTourOpen] = useState(true);
+  const [isTourOpen, setIsTourOpen] = useState(false);
+
+  useEffect(() => {
+    const tourCompletado = localStorage.getItem('tourCompletado');
+    if (!tourCompletado) {
+      setIsTourOpen(true);
+    }
+  }, []);
+
+  const finalizarTour = () => {
+    setIsTourOpen(false);
+    localStorage.setItem('tourCompletado', 'true');
+  };
 
   const manejarCambioArchivo = (evento) => {
     const archivoSeleccionado = evento.target.files[0];
@@ -280,7 +292,7 @@ function ChatPDF() {
       <Tour
         steps={pasos}
         isOpen={isTourOpen}
-        onRequestClose={() => setIsTourOpen(false)}
+        onRequestClose={finalizarTour}
       />
     </div>
   );
