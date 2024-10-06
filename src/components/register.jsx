@@ -1,6 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Register() {
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      setError('Las contraseñas no coinciden');
+      return;
+    }
+    try {
+      const response = await fetch('http://localhost:3002/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, email, password }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Error en la respuesta del servidor');
+      }
+      
+      navigate('/login');
+    } catch (err) {
+      setError('Error al registrar. Por favor, inténtalo de nuevo.');
+    }
+  };
+
+  const handleGoogleRegister = () => {
+    window.location.href = 'http://localhost:3001/auth/google';
+  };
+
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
       <div className="flex-1 flex items-center justify-center p-8">
@@ -15,7 +52,8 @@ function Register() {
           </div>
           
           <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-8">
-            <form className="space-y-6">
+            {error && <p className="text-red-500 mb-4">{error}</p>}
+            <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="space-y-2">
                 <label htmlFor="username" className="block text-sm font-medium text-gray-300">
                   Nombre de usuario
@@ -26,6 +64,8 @@ function Register() {
                   name="username" 
                   required 
                   className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -38,6 +78,8 @@ function Register() {
                   name="email" 
                   required 
                   className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -50,6 +92,8 @@ function Register() {
                   name="password" 
                   required 
                   className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -62,6 +106,8 @@ function Register() {
                   name="confirmPassword" 
                   required 
                   className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                 />
               </div>
               <button 
@@ -77,6 +123,7 @@ function Register() {
             </div>
             
             <button 
+              onClick={handleGoogleRegister}
               className="mt-6 w-full py-3 px-4 bg-white hover:bg-gray-100 text-gray-800 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2 hover:shadow-md"
             >
               <img src="https://www.google.com/favicon.ico" alt="Google logo" className="w-5 h-5" />
@@ -90,4 +137,3 @@ function Register() {
 }
 
 export default Register;
-
