@@ -177,152 +177,161 @@ function Profile() {
   };
 
   if (isLoading) {
-    return <div>Cargando...</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-900">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-900">
+        <div className="bg-red-600 text-white px-6 py-4 rounded-lg shadow-lg">
+          Error: {error}
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
       <MenuSidebar />
-      <div className="flex-1 p-10">
-        <div className="max-w-2xl mx-auto bg-gray-800 rounded-lg shadow-xl p-8">
-          <h1 className="text-3xl font-bold text-white mb-6">Perfil de Usuario</h1>
-          {isEditing ? (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="relative">
-                <input
+      <div className="flex-1 p-6 md:p-10">
+        <div className="max-w-4xl mx-auto bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
+          <div className="px-6 py-8 md:p-10">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-8">Perfil de Usuario</h1>
+            {isEditing ? (
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <InputField
                   type="email"
                   name="email"
-                  id="email"
                   value={editedInfo.email}
                   onChange={handleInputChange}
-                  className="block w-full px-4 py-3 rounded-md bg-gray-700 border-2 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                  placeholder=" "
+                  label="Email"
                 />
-                <label htmlFor="email" className="absolute text-sm text-gray-400 duration-200 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-gray-800 px-2 peer-focus:px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-2">Email</label>
-              </div>
-              <div className="relative">
-                <input
+                <InputField
                   type="text"
                   name="username"
-                  id="username"
                   value={editedInfo.username}
                   onChange={handleInputChange}
-                  className="block w-full px-4 py-3 rounded-md bg-gray-700 border-2 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                  placeholder=" "
+                  label="Nombre de usuario"
                 />
-                <label htmlFor="username" className="absolute text-sm text-gray-400 duration-200 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-gray-800 px-2 peer-focus:px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-2">Nombre de usuario</label>
-              </div>
-              <div className="relative">
-                <input
+                <InputField
                   type="password"
                   name="currentPassword"
-                  id="currentPassword"
                   value={editedInfo.currentPassword}
                   onChange={handleInputChange}
-                  className="block w-full px-4 py-3 rounded-md bg-gray-700 border-2 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                  placeholder=" "
+                  label="Contraseña actual"
                 />
-                <label htmlFor="currentPassword" className="absolute text-sm text-gray-400 duration-200 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-gray-800 px-2 peer-focus:px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-2">Contraseña actual</label>
-              </div>
-              <div className="relative">
-                <input
+                <InputField
                   type="password"
                   name="newPassword"
-                  id="newPassword"
                   value={editedInfo.newPassword}
                   onChange={handleInputChange}
-                  className="block w-full px-4 py-3 rounded-md bg-gray-700 border-2 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                  placeholder=" "
+                  label="Nueva contraseña"
                 />
-                <label htmlFor="newPassword" className="absolute text-sm text-gray-400 duration-200 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-gray-800 px-2 peer-focus:px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-2">Nueva contraseña</label>
-              </div>
-              <div className="relative">
-                <input
+                <InputField
                   type="password"
                   name="confirmPassword"
-                  id="confirmPassword"
                   value={editedInfo.confirmPassword}
                   onChange={handleInputChange}
-                  className="block w-full px-4 py-3 rounded-md bg-gray-700 border-2 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                  placeholder=" "
+                  label="Confirmar nueva contraseña"
                 />
-                <label htmlFor="confirmPassword" className="absolute text-sm text-gray-400 duration-200 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-gray-800 px-2 peer-focus:px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-2">Confirmar nueva contraseña</label>
-              </div>
-              <div className="flex space-x-4">
-                <button type="submit" className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition duration-200">Guardar cambios</button>
-                <button type="button" onClick={() => setIsEditing(false)} className="flex-1 bg-gray-600 text-white px-6 py-3 rounded-md hover:bg-gray-700 transition duration-200">Cancelar</button>
-              </div>
-            </form>
-          ) : (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-400">Email</label>
-                <p className="mt-1 text-lg text-white">{userInfo.email}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-400">Nombre de usuario</label>
-                <p className="mt-1 text-lg text-white">{userInfo.username}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-400">Fecha de registro</label>
-                <p className="mt-1 text-lg text-white">
-                  {new Date(userInfo.createdAt).toLocaleDateString()}
-                </p>
-              </div>
-              <div>
-                <h2 className="text-2xl font-semibold text-white mt-8 mb-4">Información de Suscripción</h2>
-                {subscriptionInfo ? (
-                  <>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-400">Tipo de suscripción</label>
-                      <p className="mt-1 text-lg text-white">{subscriptionInfo.tipo}</p>
+                <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                  <Button type="submit" color="blue">Guardar cambios</Button>
+                  <Button type="button" color="gray" onClick={() => setIsEditing(false)}>Cancelar</Button>
+                </div>
+              </form>
+            ) : (
+              <div className="space-y-8">
+                <InfoSection label="Email" value={userInfo.email} />
+                <InfoSection label="Nombre de usuario" value={userInfo.username} />
+                <InfoSection
+                  label="Fecha de registro"
+                  value={new Date(userInfo.createdAt).toLocaleDateString()}
+                />
+                
+                <div className="mt-12">
+                  <h2 className="text-2xl font-semibold text-white mb-6">Información de Suscripción</h2>
+                  {subscriptionInfo ? (
+                    <div className="bg-gray-700 rounded-xl p-6 space-y-4">
+                      <InfoSection label="Tipo de suscripción" value={subscriptionInfo.tipo} />
+                      <InfoSection label="Estado" value={subscriptionInfo.estado} />
+                      <InfoSection
+                        label="Fecha de inicio"
+                        value={new Date(subscriptionInfo.fechaInicio).toLocaleDateString()}
+                      />
+                      <InfoSection label="Periodo de facturación" value={subscriptionInfo.periodoFacturacion} />
+                      <InfoSection
+                        label="Monto"
+                        value={`${subscriptionInfo.monto} ${subscriptionInfo.moneda}`}
+                      />
+                      <div className="mt-6">
+                        <Button onClick={handleManageSubscription} color="green">
+                          Manejar Suscripción
+                        </Button>
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-400">Estado</label>
-                      <p className="mt-1 text-lg text-white">{subscriptionInfo.estado}</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-400">Fecha de inicio</label>
-                      <p className="mt-1 text-lg text-white">
-                        {new Date(subscriptionInfo.fechaInicio).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-400">Periodo de facturación</label>
-                      <p className="mt-1 text-lg text-white">{subscriptionInfo.periodoFacturacion}</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-400">Monto</label>
-                      <p className="mt-1 text-lg text-white">
-                        {subscriptionInfo.monto} {subscriptionInfo.moneda}
-                      </p>
-                    </div>
-                    <div className="mt-4">
-                      <button
-                        onClick={handleManageSubscription}
-                        className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition duration-200"
-                      >
-                        Manejar Suscripción
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <p className="text-gray-400">No hay información de suscripción disponible</p>
-                )}
+                  ) : (
+                    <p className="text-gray-400">No hay información de suscripción disponible</p>
+                  )}
+                </div>
+                
+                <div className="mt-8">
+                  <Button onClick={() => setIsEditing(true)} color="blue">Editar perfil</Button>
+                </div>
               </div>
-              <div>
-                <button onClick={() => setIsEditing(true)} className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition duration-200">Editar perfil</button>
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>
   );
 }
+
+const InputField = ({ type, name, value, onChange, label }) => (
+  <div className="relative">
+    <input
+      type={type}
+      name={name}
+      id={name}
+      value={value}
+      onChange={onChange}
+      className="block w-full px-4 py-3 rounded-lg bg-gray-700 border-2 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+      placeholder=" "
+    />
+    <label
+      htmlFor={name}
+      className="absolute text-sm text-gray-400 duration-200 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-gray-800 px-2 peer-focus:px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-2"
+    >
+      {label}
+    </label>
+  </div>
+);
+
+const InfoSection = ({ label, value }) => (
+  <div>
+    <label className="block text-sm font-medium text-gray-400">{label}</label>
+    <p className="mt-1 text-lg text-white">{value}</p>
+  </div>
+);
+
+const Button = ({ children, color, ...props }) => {
+  const colors = {
+    blue: "bg-blue-600 hover:bg-blue-700",
+    green: "bg-green-600 hover:bg-green-700",
+    gray: "bg-gray-600 hover:bg-gray-700"
+  };
+
+  return (
+    <button
+      className={`${colors[color]} text-white px-6 py-3 rounded-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-${color}-500`}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+};
 
 export default Profile;
