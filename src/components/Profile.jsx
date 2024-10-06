@@ -11,7 +11,8 @@ function Profile() {
   const [editedInfo, setEditedInfo] = useState({
     email: '',
     username: '',
-    password: '',
+    currentPassword: '',
+    newPassword: '',
     confirmPassword: ''
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -43,7 +44,8 @@ function Profile() {
         setEditedInfo({
           email: data.email,
           username: data.username,
-          password: '',
+          currentPassword: '',
+          newPassword: '',
           confirmPassword: ''
         });
       } catch (error) {
@@ -64,28 +66,74 @@ function Profile() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editedInfo.password !== editedInfo.confirmPassword) {
-      setError('Las contraseñas no coinciden');
-      return;
-    }
+    setError('');
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3002/update-user', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(editedInfo)
-      });
+      
+      // Actualizar nombre de usuario
+      if (editedInfo.username !== userInfo.username) {
+        const usernameResponse = await fetch('http://localhost:3002/update-user', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ newUsername: editedInfo.username })
+        });
 
-      if (!response.ok) {
-        throw new Error('Error al actualizar la información del usuario');
+        if (!usernameResponse.ok) {
+          throw new Error('Error al actualizar el nombre de usuario');
+        }
       }
 
-      const updatedData = await response.json();
-      setUserInfo(updatedData);
+      // Actualizar email
+      if (editedInfo.email !== userInfo.email) {
+        const emailResponse = await fetch('http://localhost:3002/update-email', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ newEmail: editedInfo.email })
+        });
+
+        if (!emailResponse.ok) {
+          throw new Error('Error al actualizar el email');
+        }
+      }
+
+      // Actualizar contraseña
+      if (editedInfo.currentPassword && editedInfo.newPassword) {
+        if (editedInfo.newPassword !== editedInfo.confirmPassword) {
+          setError('Las contraseñas nuevas no coinciden');
+          return;
+        }
+
+        const passwordResponse = await fetch('http://localhost:3002/update-password', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            currentPassword: editedInfo.currentPassword,
+            newPassword: editedInfo.newPassword
+          })
+        });
+
+        if (!passwordResponse.ok) {
+          throw new Error('Error al actualizar la contraseña');
+        }
+      }
+
+      // Actualizar la información del usuario en el estado
+      setUserInfo(prev => ({
+        ...prev,
+        email: editedInfo.email,
+        username: editedInfo.username
+      }));
+
       setIsEditing(false);
       setError('');
     } catch (error) {
@@ -137,14 +185,26 @@ function Profile() {
               <div className="relative">
                 <input
                   type="password"
-                  name="password"
-                  id="password"
-                  value={editedInfo.password}
+                  name="currentPassword"
+                  id="currentPassword"
+                  value={editedInfo.currentPassword}
                   onChange={handleInputChange}
                   className="block w-full px-4 py-3 rounded-md bg-gray-700 border-2 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
                   placeholder=" "
                 />
-                <label htmlFor="password" className="absolute text-sm text-gray-400 duration-200 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-gray-800 px-2 peer-focus:px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-2">Nueva contraseña</label>
+                <label htmlFor="currentPassword" className="absolute text-sm text-gray-400 duration-200 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-gray-800 px-2 peer-focus:px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-2">Contraseña actual</label>
+              </div>
+              <div className="relative">
+                <input
+                  type="password"
+                  name="newPassword"
+                  id="newPassword"
+                  value={editedInfo.newPassword}
+                  onChange={handleInputChange}
+                  className="block w-full px-4 py-3 rounded-md bg-gray-700 border-2 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                  placeholder=" "
+                />
+                <label htmlFor="newPassword" className="absolute text-sm text-gray-400 duration-200 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-gray-800 px-2 peer-focus:px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-2">Nueva contraseña</label>
               </div>
               <div className="relative">
                 <input

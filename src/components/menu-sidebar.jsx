@@ -49,7 +49,7 @@ const MenuSidebar = () => {
   const menuItems = [
     { icon: FaHome, text: 'Inicio', link: '/dashboard' },
     { icon: FaComments, text: 'Chat', link: '/chatpdf' },
-    { icon: FaUser, text: 'Perfil', link: '/profile' }, // Cambiado de '/perfil' a '/profile'
+    { icon: FaUser, text: 'Perfil', link: '/perfil' }, // Cambiado de '/profile' a '/perfil'
     { icon: FaSignOutAlt, text: 'Cerrar sesión', onClick: handleLogout, danger: true },
   ];
 
