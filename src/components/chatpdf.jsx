@@ -15,6 +15,7 @@ function ChatPDF() {
   const [isDragging, setIsDragging] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const navigate = useNavigate();
+  const [caracteresRestantes, setCaracteresRestantes] = useState(4000);
 
   const manejarCambioArchivo = (evento) => {
     const archivoSeleccionado = evento.target.files[0];
@@ -50,6 +51,7 @@ function ChatPDF() {
   const manejarCambioMensaje = (evento) => {
     const nuevoMensaje = evento.target.value.slice(0, 4000);
     setMensaje(nuevoMensaje);
+    setCaracteresRestantes(4000 - nuevoMensaje.length);
   };
 
   const enviarMensaje = async () => {
@@ -323,26 +325,31 @@ function ChatPDF() {
           )}
 
           {/* Nuevo input para escribir mensaje con el chatbot */}
-          <div className="relative flex items-center mt-4">
-            <input
-              type="text"
-              value={mensaje}
-              onChange={manejarCambioMensaje}
-              placeholder="Escribe tu mensaje para el chatbot..."
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors duration-200"
-              disabled={cargando}
-              onKeyPress={(e) => e.key === 'Enter' && enviarMensaje()}
-              maxLength={4000}
-            />
-            <button
-              onClick={enviarMensaje}
-              disabled={cargando || mensaje.trim() === ''}
-              className="absolute right-2 p-2 text-blue-400 hover:text-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-              </svg>
-            </button>
+          <div className="relative flex flex-col items-center mt-4">
+            <div className="w-full relative">
+              <input
+                type="text"
+                value={mensaje}
+                onChange={manejarCambioMensaje}
+                placeholder="Escribe tu mensaje para el chatbot..."
+                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors duration-200"
+                disabled={cargando}
+                onKeyPress={(e) => e.key === 'Enter' && enviarMensaje()}
+                maxLength={4000}
+              />
+              <button
+                onClick={enviarMensaje}
+                disabled={cargando || mensaje.trim() === ''}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 text-blue-400 hover:text-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+              </button>
+            </div>
+            <div className="text-sm text-gray-400 mt-1 self-end">
+              {caracteresRestantes} caracteres restantes
+            </div>
           </div>
         </div>
       </div>
