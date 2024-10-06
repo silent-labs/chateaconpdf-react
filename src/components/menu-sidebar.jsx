@@ -1,19 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaChartBar, FaUser, FaCog, FaSignOutAlt, FaBars, FaChevronLeft } from 'react-icons/fa';
+import { FaChartBar, FaUser, FaCog, FaSignOutAlt, FaBars, FaChevronLeft, FaEnvelope } from 'react-icons/fa';
 
 const MenuSidebar = () => {
   const [isExpanded, setIsExpanded] = useState(true);
+  const [userEmail, setUserEmail] = useState('');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:3002/user-info', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Error al obtener la información del usuario');
+        }
+
+        const data = await response.json();
+        setUserEmail(data.email);
+      } catch (error) {
+        console.error('Error:', error);
+        navigate('/login');
+      }
+    };
+
+    fetchUserInfo();
+  }, [navigate]);
 
   const toggleSidebar = () => {
     setIsExpanded(!isExpanded);
   };
 
   const handleLogout = () => {
-    // Eliminar el token del almacenamiento local
     localStorage.removeItem('token');
-    // Redirigir al usuario a la página de inicio de sesión
     navigate('/login');
   };
 
@@ -39,6 +68,12 @@ const MenuSidebar = () => {
           {isExpanded ? <FaChevronLeft size={20} /> : <FaBars size={20} />}
         </button>
       </div>
+      {isExpanded && userEmail && (
+        <div className="mb-6 flex items-center text-sm text-gray-400">
+          <FaEnvelope className="mr-2" />
+          <span className="truncate">{userEmail}</span>
+        </div>
+      )}
       <nav>
         <ul className="space-y-2">
           {menuItems.map((item, index) => (
