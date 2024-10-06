@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaHome, FaComments, FaUser, FaSignOutAlt, FaBars, FaChevronLeft, FaEnvelope } from 'react-icons/fa';
+import { FaHome, FaComments, FaUser, FaSignOutAlt, FaBars, FaChevronLeft, FaEnvelope, FaCreditCard } from 'react-icons/fa';
 
 const MenuSidebar = () => {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -49,7 +49,8 @@ const MenuSidebar = () => {
   const menuItems = [
     { icon: FaHome, text: 'Inicio', link: '/dashboard' },
     { icon: FaComments, text: 'Chat', link: '/chatpdf' },
-    { icon: FaUser, text: 'Perfil', link: '/perfil' }, // Cambiado de '/profile' a '/perfil'
+    { icon: FaUser, text: 'Perfil', link: '/perfil' },
+    { icon: FaCreditCard, text: 'Suscripciones', link: '/suscripcion' },
     { icon: FaSignOutAlt, text: 'Cerrar sesión', onClick: handleLogout, danger: true },
   ];
 
