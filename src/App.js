@@ -7,6 +7,7 @@ import ChatPDF from './components/chatpdf';
 import Register from './components/register';
 import Profile from './components/Profile';
 import ProtectedRoute from './components/ProtectedRoute';
+import Suscripciones from './components/Suscripciones';
 import './index.css';
 
 function App() {
@@ -46,6 +47,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/suscripcion" 
+            element={
+              <ProtectedRoute>
+                <Suscripciones />
               </ProtectedRoute>
             } 
           />
