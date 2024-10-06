@@ -29,6 +29,35 @@ function ChatPDF() {
     }
   }, []);
 
+  useEffect(() => {
+    const verificarToken = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:3002/verify-token', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Token inválido');
+        }
+      } catch (error) {
+        console.error('Error al verificar el token:', error);
+        localStorage.removeItem('token');
+        navigate('/login');
+      }
+    };
+
+    verificarToken();
+  }, [navigate]);
+
   const finalizarTour = () => {
     setIsTourOpen(false);
     localStorage.setItem('tourCompletado', 'true');

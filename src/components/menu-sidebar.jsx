@@ -1,19 +1,27 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaChartBar, FaUser, FaCog, FaSignOutAlt, FaBars, FaChevronLeft } from 'react-icons/fa';
 
 const MenuSidebar = () => {
   const [isExpanded, setIsExpanded] = useState(true);
+  const navigate = useNavigate();
 
   const toggleSidebar = () => {
     setIsExpanded(!isExpanded);
+  };
+
+  const handleLogout = () => {
+    // Eliminar el token del almacenamiento local
+    localStorage.removeItem('token');
+    // Redirigir al usuario a la página de inicio de sesión
+    navigate('/login');
   };
 
   const menuItems = [
     { icon: FaChartBar, text: 'Dashboard', link: '/dashboard' },
     { icon: FaUser, text: 'Perfil', link: '/perfil' },
     { icon: FaCog, text: 'Configuración', link: '/configuracion' },
-    { icon: FaSignOutAlt, text: 'Cerrar sesión', link: '/login', danger: true },
+    { icon: FaSignOutAlt, text: 'Cerrar sesión', onClick: handleLogout, danger: true },
   ];
 
   return (
@@ -35,26 +43,49 @@ const MenuSidebar = () => {
         <ul className="space-y-2">
           {menuItems.map((item, index) => (
             <li key={index}>
-              <Link
-                to={item.link}
-                className={`flex items-center py-3 px-4 rounded-xl ${
-                  item.danger ? 'hover:bg-red-600/20' : 'hover:bg-blue-600/20'
-                } transition duration-200 group`}
-              >
-                <div className={`flex items-center justify-center ${isExpanded ? 'w-8 mr-3' : 'w-full'}`}>
-                  <item.icon
-                    size={22}
-                    className={`${
-                      item.danger ? 'text-red-400' : 'text-blue-400'
-                    } group-hover:scale-110 transition-all duration-200`}
-                  />
-                </div>
-                {isExpanded && (
-                  <span className={`font-medium ${item.danger ? 'group-hover:text-red-400' : 'group-hover:text-blue-400'} transition-colors duration-200`}>
-                    {item.text}
-                  </span>
-                )}
-              </Link>
+              {item.onClick ? (
+                <button
+                  onClick={item.onClick}
+                  className={`flex items-center py-3 px-4 rounded-xl w-full ${
+                    item.danger ? 'hover:bg-red-600/20' : 'hover:bg-blue-600/20'
+                  } transition duration-200 group`}
+                >
+                  <div className={`flex items-center justify-center ${isExpanded ? 'w-8 mr-3' : 'w-full'}`}>
+                    <item.icon
+                      size={22}
+                      className={`${
+                        item.danger ? 'text-red-400' : 'text-blue-400'
+                      } group-hover:scale-110 transition-all duration-200`}
+                    />
+                  </div>
+                  {isExpanded && (
+                    <span className={`font-medium ${item.danger ? 'group-hover:text-red-400' : 'group-hover:text-blue-400'} transition-colors duration-200`}>
+                      {item.text}
+                    </span>
+                  )}
+                </button>
+              ) : (
+                <Link
+                  to={item.link}
+                  className={`flex items-center py-3 px-4 rounded-xl ${
+                    item.danger ? 'hover:bg-red-600/20' : 'hover:bg-blue-600/20'
+                  } transition duration-200 group`}
+                >
+                  <div className={`flex items-center justify-center ${isExpanded ? 'w-8 mr-3' : 'w-full'}`}>
+                    <item.icon
+                      size={22}
+                      className={`${
+                        item.danger ? 'text-red-400' : 'text-blue-400'
+                      } group-hover:scale-110 transition-all duration-200`}
+                    />
+                  </div>
+                  {isExpanded && (
+                    <span className={`font-medium ${item.danger ? 'group-hover:text-red-400' : 'group-hover:text-blue-400'} transition-colors duration-200`}>
+                      {item.text}
+                    </span>
+                  )}
+                </Link>
+              )}
             </li>
           ))}
         </ul>
