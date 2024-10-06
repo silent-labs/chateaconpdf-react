@@ -20,6 +20,7 @@ function ChatPDF() {
   const [caracteresRestantes, setCaracteresRestantes] = useState(4000);
   const fileInputRef = useRef(null);
   const [isTourOpen, setIsTourOpen] = useState(false);
+  const [limiteMensajes, setLimiteMensajes] = useState(50); // Estado para el límite de mensajes
 
   useEffect(() => {
     const tourCompletado = localStorage.getItem('tourCompletado');
@@ -50,11 +51,15 @@ function ChatPDF() {
   };
 
   const enviarMensaje = async () => {
-    if (mensaje.trim() === '') return;
+    if (mensaje.trim() === '' || limiteMensajes <= 0) return;
 
     const nuevoMensaje = { tipo: 'user', texto: mensaje };
-    setMensajes([...mensajes, nuevoMensaje]);
+    setMensajes(prevMensajes => {
+      const nuevosMensajes = [...prevMensajes, nuevoMensaje];
+      return nuevosMensajes.slice(-limiteMensajes);
+    });
     setMensaje('');
+    setLimiteMensajes(prevLimite => prevLimite - 1); // Reducir el límite solo para mensajes del usuario
 
     setCargando(true);
     try {
@@ -68,7 +73,11 @@ function ChatPDF() {
 
       const datos = await respuesta.json();
       const mensajeBot = { tipo: 'bot', texto: datos.respuesta };
-      setMensajes((prevMensajes) => [...prevMensajes, mensajeBot]);
+      setMensajes(prevMensajes => {
+        const nuevosMensajes = [...prevMensajes, mensajeBot];
+        return nuevosMensajes.slice(-limiteMensajes);
+      });
+      // Eliminamos la línea que reducía el límite para mensajes del bot
     } catch (error) {
       console.error('Error:', error);
       alert('Hubo un error al procesar el mensaje. Por favor, intenta de nuevo.');
@@ -101,7 +110,11 @@ function ChatPDF() {
         tipo: 'bot', 
         texto: 'El PDF ha sido procesado correctamente. ¿Qué te gustaría saber sobre su contenido?' 
       };
-      setMensajes((prevMensajes) => [...prevMensajes, mensajeBot]);
+      setMensajes(prevMensajes => {
+        const nuevosMensajes = [...prevMensajes, mensajeBot];
+        return nuevosMensajes.slice(-limiteMensajes);
+      });
+      // Eliminamos la línea que reducía el límite para mensajes del bot
     } catch (error) {
       console.error('Error:', error);
       alert('Hubo un error al procesar el PDF. Por favor, intenta de nuevo.');
@@ -251,7 +264,7 @@ function ChatPDF() {
                 onChange={manejarCambioMensaje}
                 placeholder="Escribe tu mensaje para el chatbot..."
                 className="w-full px-4 py-3 pl-12 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors duration-200"
-                disabled={cargando}
+                disabled={cargando || limiteMensajes <= 0}
                 onKeyPress={(e) => e.key === 'Enter' && enviarMensaje()}
                 maxLength={4000}
               />
@@ -275,7 +288,7 @@ function ChatPDF() {
               </Tippy>
               <button
                 onClick={enviarMensaje}
-                disabled={cargando || mensaje.trim() === ''}
+                disabled={cargando || mensaje.trim() === '' || limiteMensajes <= 0}
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 text-blue-400 hover:text-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -287,6 +300,9 @@ function ChatPDF() {
               {caracteresRestantes} caracteres restantes
             </div>
           </div>
+        </div>
+        <div className="text-sm text-gray-400 mt-4 text-center">
+          Mensajes restantes: {limiteMensajes}
         </div>
       </div>
       <Tour
