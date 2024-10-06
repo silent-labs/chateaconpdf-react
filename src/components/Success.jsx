@@ -1,10 +1,39 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function Success() {
   const navigate = useNavigate();
+  const [subscriptionInfo, setSubscriptionInfo] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
+    const verifySubscription = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:3002/verify-subscription', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Error al verificar la suscripción');
+        }
+
+        const data = await response.json();
+        if (data.success) {
+          setSubscriptionInfo(data.subscription);
+        } else {
+          setError(data.message);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        setError('No se pudo verificar la suscripción');
+      }
+    };
+
+    verifySubscription();
+
     const timer = setTimeout(() => {
       navigate('/profile');
     }, 5000);
@@ -22,6 +51,19 @@ function Success() {
         <p className="text-gray-300 mb-6">
           Gracias por tu suscripción. Tu pago ha sido procesado correctamente.
         </p>
+        {subscriptionInfo && (
+          <div className="text-left mb-6">
+            <h3 className="text-xl font-semibold text-white mb-2">Detalles de la suscripción:</h3>
+            <p className="text-gray-300">Tipo: {subscriptionInfo.tipo}</p>
+            <p className="text-gray-300">Estado: {subscriptionInfo.estado}</p>
+            <p className="text-gray-300">Fecha de inicio: {new Date(subscriptionInfo.fechaInicio).toLocaleDateString()}</p>
+            <p className="text-gray-300">Periodo de facturación: {subscriptionInfo.periodoFacturacion}</p>
+            <p className="text-gray-300">Monto: {subscriptionInfo.monto} {subscriptionInfo.moneda}</p>
+          </div>
+        )}
+        {error && (
+          <p className="text-red-500 mb-6">{error}</p>
+        )}
         <p className="text-gray-400">
           Serás redirigido a tu perfil en 5 segundos...
         </p>

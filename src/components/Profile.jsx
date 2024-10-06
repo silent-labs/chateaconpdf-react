@@ -254,18 +254,18 @@ function Profile() {
                 
                 <div className="mt-12">
                   <h2 className="text-2xl font-semibold text-white mb-6">Información de Suscripción</h2>
-                  {subscriptionInfo ? (
+                  {subscriptionInfo && subscriptionInfo.tipo ? (
                     <div className="bg-gray-700 rounded-xl p-6 space-y-4">
                       <InfoSection label="Tipo de suscripción" value={subscriptionInfo.tipo} />
                       <InfoSection label="Estado" value={subscriptionInfo.estado} />
                       <InfoSection
                         label="Fecha de inicio"
-                        value={new Date(subscriptionInfo.fechaInicio).toLocaleDateString()}
+                        value={subscriptionInfo.fechaInicio ? new Date(subscriptionInfo.fechaInicio).toLocaleDateString() : 'No disponible'}
                       />
                       <InfoSection label="Periodo de facturación" value={subscriptionInfo.periodoFacturacion} />
                       <InfoSection
                         label="Monto"
-                        value={`${subscriptionInfo.monto} ${subscriptionInfo.moneda}`}
+                        value={subscriptionInfo.monto && subscriptionInfo.moneda ? `${subscriptionInfo.monto} ${subscriptionInfo.moneda}` : 'No disponible'}
                       />
                       <div className="mt-6">
                         <Button onClick={handleManageSubscription} color="green">
@@ -274,7 +274,13 @@ function Profile() {
                       </div>
                     </div>
                   ) : (
-                    <p className="text-gray-400">No hay información de suscripción disponible</p>
+                    <div className="bg-yellow-600 text-white p-6 rounded-xl shadow-lg">
+                      <h3 className="text-xl font-semibold mb-2">¡No tienes una suscripción activa!</h3>
+                      <p className="mb-4">Mejora tu experiencia suscribiéndote a nuestro servicio premium.</p>
+                      <Button onClick={() => navigate('/suscripcion')} color="blue">
+                        Obtener Suscripción
+                      </Button>
+                    </div>
                   )}
                 </div>
                 
