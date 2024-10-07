@@ -9,6 +9,7 @@ import ChatPDF from './components/chatpdf';
 import ProtectedRoute from './components/ProtectedRoute';
 import Suscripciones from './components/Suscripciones';
 import Success from './components/Success';
+import Home from './components/home';
 import './index.css';
 
 function App() {
@@ -16,7 +17,7 @@ function App() {
     <Router>
       <div>
         <Routes>
-          <Route path="/" element={<h1>Página de inicio</h1>} />
+          <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route 
