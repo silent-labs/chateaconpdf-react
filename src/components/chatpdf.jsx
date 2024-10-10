@@ -81,7 +81,7 @@ function ChatPDF() {
 
   const enviarMensaje = async () => {
     if (mensaje.trim() === '' || limiteMensajes <= 0) return;
-
+  
     const nuevoMensaje = { tipo: 'user', texto: mensaje };
     setMensajes(prevMensajes => {
       const nuevosMensajes = [...prevMensajes, nuevoMensaje];
@@ -89,24 +89,27 @@ function ChatPDF() {
     });
     setMensaje('');
     setLimiteMensajes(prevLimite => prevLimite - 1); // Reducir el límite solo para mensajes del usuario
-
+  
     setCargando(true);
     try {
+      const token = localStorage.getItem('token'); // Obtener el token del localStorage
       const respuesta = await fetch('http://localhost:3002/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Incluir el token en el encabezado
+        },
         body: JSON.stringify({ mensaje, contexto: contextoPDF }),
       });
-
+  
       if (!respuesta.ok) throw new Error('Error al procesar el mensaje');
-
+  
       const datos = await respuesta.json();
       const mensajeBot = { tipo: 'bot', texto: datos.respuesta };
       setMensajes(prevMensajes => {
         const nuevosMensajes = [...prevMensajes, mensajeBot];
         return nuevosMensajes.slice(-limiteMensajes);
       });
-      // Eliminamos la línea que reducía el límite para mensajes del bot
     } catch (error) {
       console.error('Error:', error);
       alert('Hubo un error al procesar el mensaje. Por favor, intenta de nuevo.');
@@ -114,6 +117,7 @@ function ChatPDF() {
       setCargando(false);
     }
   };
+  
 
   const enviarPDF = async (file) => {
     if (!file) {
@@ -126,8 +130,12 @@ function ChatPDF() {
     formData.append('pdf', file);
   
     try {
+      const token = localStorage.getItem('token'); // Obtener el token del localStorage
       const respuesta = await fetch('http://localhost:3002/extractpdf', {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`, // Incluir el token en el encabezado
+        },
         body: formData,
       });
   
@@ -135,15 +143,14 @@ function ChatPDF() {
   
       const datos = await respuesta.json();
       setContextoPDF(datos.texto);
-      const mensajeBot = { 
-        tipo: 'bot', 
-        texto: 'El PDF ha sido procesado correctamente. ¿Qué te gustaría saber sobre su contenido?' 
+      const mensajeBot = {
+        tipo: 'bot',
+        texto: 'El PDF ha sido procesado correctamente. ¿Qué te gustaría saber sobre su contenido?'
       };
       setMensajes(prevMensajes => {
         const nuevosMensajes = [...prevMensajes, mensajeBot];
         return nuevosMensajes.slice(-limiteMensajes);
       });
-      // Eliminamos la línea que reducía el límite para mensajes del bot
     } catch (error) {
       console.error('Error:', error);
       alert('Hubo un error al procesar el PDF. Por favor, intenta de nuevo.');
@@ -151,6 +158,7 @@ function ChatPDF() {
       setCargando(false);
     }
   };
+  
 
   const copiarAlPortapapeles = useCallback((texto) => {
     navigator.clipboard.writeText(texto).then(
